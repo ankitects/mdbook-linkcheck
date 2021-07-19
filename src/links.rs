@@ -1,7 +1,7 @@
 use codespan::{FileId, Files, Span};
 use linkcheck::Link;
 use pulldown_cmark::{BrokenLink, CowStr};
-use std::{cell::RefCell, fmt::Debug};
+use std::{cell::RefCell, ffi::OsStr, fmt::Debug, path::PathBuf};
 
 /// Search every file in the [`Files`] and collate all the links that are
 /// found.
@@ -17,25 +17,33 @@ where
 
     for file_id in target_files {
         let src = files.source(file_id);
-        log::debug!("Scanning {}", files.name(file_id).to_string_lossy());
+        let file_path = PathBuf::from(&files.name(file_id));
+        let file_name =
+            file_path.file_name().expect("File names can't end in ..");
+        log::debug!("Scanning {}", &files.name(file_id).to_string_lossy());
 
-        links.extend(scan_links(file_id, &*src, &mut |broken_link| {
-            let BrokenLink {
-                reference, span, ..
-            } = broken_link;
-            log::debug!(
-                "Found a (possibly) broken link to [{}] at {:?}",
-                reference,
-                span
-            );
+        links.extend(scan_links(
+            file_id,
+            &file_name,
+            &*src,
+            &mut |broken_link| {
+                let BrokenLink {
+                    reference, span, ..
+                } = broken_link;
+                log::debug!(
+                    "Found a (possibly) broken link to [{}] at {:?}",
+                    reference,
+                    span
+                );
 
-            broken_links.borrow_mut().push(IncompleteLink {
-                reference: broken_link.reference.to_string(),
-                span: Span::new(span.start as u32, span.end as u32),
-                file: file_id,
-            });
-            None
-        }));
+                broken_links.borrow_mut().push(IncompleteLink {
+                    reference: broken_link.reference.to_string(),
+                    span: Span::new(span.start as u32, span.end as u32),
+                    file: file_id,
+                });
+                None
+            },
+        ));
     }
 
     (links, broken_links.into_inner())
@@ -43,14 +51,18 @@ where
 
 fn scan_links<'a, F>(
     file_id: FileId,
+    file_name: &'a OsStr,
     src: &'a str,
     cb: &'a mut F,
 ) -> impl Iterator<Item = Link> + 'a
 where
     F: FnMut(BrokenLink<'_>) -> Option<(CowStr<'a>, CowStr<'a>)> + 'a,
 {
-    linkcheck::scanners::markdown_with_broken_link_callback(src, Some(cb))
-        .map(move |(link, span)| Link::new(link, span, file_id))
+    linkcheck::scanners::markdown_with_broken_link_callback(src, Some(cb)).map(
+        move |(link, span)| {
+            Link::new(link, span, file_id, file_name.to_os_string())
+        },
+    )
 }
 
 /// A potential link that has a broken reference (e.g `[foo]` when there is no
