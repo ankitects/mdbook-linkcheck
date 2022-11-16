@@ -15,12 +15,12 @@ fn check_all_links_in_a_valid_book() {
     let root = test_dir().join("all-green");
     let expected_valid = &[
         "../chapter_1.md",
-        "../chapter_1.md#Subheading",
+        "../chapter_1.md#subheading",
         "./chapter_1.html",
         "./chapter_1.md",
         "./sibling.md",
         "/chapter_1.md",
-        "/chapter_1.md#Subheading",
+        "/chapter_1.md#subheading",
         "https://crates.io/crates/mdbook-linkcheck",
         "https://www.google.com/",
         "nested/",
@@ -122,12 +122,12 @@ fn skip_web_links() {
     let root = test_dir().join("external-links");
     let expected_valid = &[
         "../chapter_1.md",
-        "../chapter_1.md#Subheading",
+        "../chapter_1.md#subheading",
         "./chapter_1.html",
         "./chapter_1.md",
         "./sibling.md",
         "/chapter_1.md",
-        "/chapter_1.md#Subheading",
+        "/chapter_1.md#subheading",
         "nested/",
         "nested/README.md",
         "sibling.md",
