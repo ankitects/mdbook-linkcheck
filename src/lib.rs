@@ -9,8 +9,10 @@
 //!    round
 //! 4. Emit errors/warnings to the user
 
+// Note: older versions of Rust (e.g. v1.46.0) don't know about "rustdoc" lints
+#![allow(unknown_lints)]
 #![deny(
-    broken_intra_doc_links,
+    rustdoc::broken_intra_doc_links,
     missing_docs,
     missing_debug_implementations,
     missing_copy_implementations

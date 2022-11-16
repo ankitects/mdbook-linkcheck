@@ -18,7 +18,7 @@ jobs:
         ]
         include:
           - name: linux
-            os: ubuntu-latest
+            os: ubuntu-18.04
             artifact_name: "target/dist/*.zip"
             asset_name: mdbook-linkcheck-linux
           - name: windows
@@ -59,7 +59,7 @@ jobs:
       - name: Publish the Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "public/*.zip"
+          artifacts: "public/mdbook-linkcheck-*/*.zip"
           body: |
             Released ${{ github.ref }}.
           token: ${{ secrets.GITHUB_TOKEN }}
