@@ -21,7 +21,7 @@ codespan-reporting = "0.11"
 dunce = "1.0.0"
 env_logger = "0.9"
 http = "0.2"
-linkcheck = { git = "https://github.com/RumovZ/linkcheck.git", rev = "9a598bb410b52be4ebf382814bd82660d11e0f3e" }
+linkcheck = { path = "./linkcheck" }
 log = "0.4"
 mdbook = { version = "0.4", default-features = false }
 pulldown-cmark = "0.8.0"
